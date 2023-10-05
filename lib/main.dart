@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'api/api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,6 +44,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  bool _responseOk = false;
+  Api api = Api();
 
   void _incrementCounter() {
     setState(() {
@@ -50,6 +55,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _counter++;
+    });
+  }
+
+  Future<dynamic> _fetchAlbums() async {
+    final response =
+        await api.get('https://jsonplaceholder.typicode.com/albums/1');
+
+    _setResponseOk(response.statusCode >= 200);
+    print(response);
+    print(response.statusCode);
+    print(response.reasonPhrase);
+    print(response.body);
+    return response;
+  }
+
+  void _setResponseOk(bool value) {
+    setState(() {
+      _responseOk = value;
     });
   }
 
@@ -70,26 +93,24 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            const Text(
+              'Response Ok: ',
             ),
             Text(
-              '$_counter',
+              '$_responseOk',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text("Row2")
-              ],
-            )
+            // const Row(
+            //   mainAxisAlignment: MainAxisAlignment.start,
+            //   children: <Widget>[Text("Row2")],
+            // )
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: _fetchAlbums,
+        tooltip: 'Fetch Albums',
+        child: const Text("Fetch Albums"),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
